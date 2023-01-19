@@ -1,0 +1,23 @@
+{
+  "name": "sql-query-generator",
+  "version": "1.0.0",
+  "description": "des",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/amrishkhan05/sql-query-generator.git"
+  },
+  "keywords": [
+    "SQL",
+    "SQL-QUERY-GENERATOR"
+  ],
+  "author": "Amrishkhan Sheik Abdullah",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amrishkhan05/sql-query-generator/issues"
+  },
+  "homepage": "https://github.com/amrishkhan05/sql-query-generator#readme"
+}
