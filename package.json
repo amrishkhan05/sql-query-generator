@@ -1,7 +1,7 @@
 {
   "name": "sql-query-generator",
   "version": "1.0.0",
-  "description": "des",
+  "description": "SQL Query generator to generate select Query with joins and alias name for the fields to be selected using a input JSON",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +12,8 @@
   },
   "keywords": [
     "SQL",
-    "SQL-QUERY-GENERATOR"
+    "SQL-QUERY-GENERATOR",
+    "SQL-QUERY"
   ],
   "author": "Amrishkhan Sheik Abdullah",
   "license": "MIT",
