@@ -1,7 +1,7 @@
 {
   "name": "sql-query-generator",
   "version": "1.0.0",
-  "description": "SQL-Query-Generator to generate select Query with joins and alias name for the fields to be selected, and the total record count using a input JSON",
+  "description": "SQL-Query-Generator to generate select Query with joins and alias name for the fields to be selected, and the total record count using a input JSON.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
