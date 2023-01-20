@@ -1,29 +1,29 @@
-function generateSelectQuery(selectconfig = {}) {
-  return async () => {
-    try {
-      const config = selectconfig;
-      const response = await CommonSubList(
-        config.tableName,
-        config.resMessage,
-        config.selectColumns,
-        config.searchField,
-        config.joins,
-        config.isChildCheck,
-        config.isParentCheck,
-        config.customSearch,
-        config.paramSearch,
-        config.customColumnQuery,
-        config.customOrSearch,
-        config.customAndSearch,
-        config.queryParams
-      );
-      return response;
-    } catch (err) {
-      console.error(err);
-      return err;
-    }
-  };
-}
+const generateSelectQuery = async (selectconfig = {}) => {
+  //   return async () => {
+  try {
+    const config = selectconfig;
+    const response = await CommonSubList(
+      config.tableName,
+      config.resMessage,
+      config.selectColumns,
+      config.searchField,
+      config.joins,
+      config.isChildCheck,
+      config.isParentCheck,
+      config.customSearch,
+      config.paramSearch,
+      config.customColumnQuery,
+      config.customOrSearch,
+      config.customAndSearch,
+      config.queryParams
+    );
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+  //   };
+};
 const CommonSubList = async (
   tableName,
   resMessage,
