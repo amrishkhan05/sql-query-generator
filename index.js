@@ -1,5 +1,4 @@
 const generateSelectQuery = async (selectconfig = {}) => {
-  //   return async () => {
   try {
     const config = selectconfig;
     const response = await CommonSubList(
@@ -17,12 +16,11 @@ const generateSelectQuery = async (selectconfig = {}) => {
       config.customAndSearch,
       config.queryParams
     );
-    return response;
+    return response.query;
   } catch (err) {
     console.error(err);
     return err;
   }
-  //   };
 };
 const CommonSubList = async (
   tableName,
@@ -110,17 +108,12 @@ const CommonSubList = async (
         customColumnQuery ? "," + customColumnQuery : ""
       } from ${tableName} t ${joinQuery}  where t.is_delete=0 and t.is_active=1 ${searchQuery} ${joinSearch}
           order by t.${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${LIMIT} ROWS ONLY `;
-      let params = [];
-
       const DynamicQuery = `SELECT (
             SELECT COUNT( 1 ) from ${tableName} t ${joinQuery}  where t.is_delete=0 and t.is_active=1 ${searchQuery} ${joinSearch}  ) AS total_count,
             ( ${sqlQuery} FOR JSON PATH ) AS master_data `;
+      let result = DynamicQuery.replace(/^\s+|\s+$/gm, " ");
 
-      console.log("************ SQL QUERY START*************");
-      console.log(DynamicQuery, params);
-      console.log("************ SQL QUERY END *************");
-
-      return DynamicQuery;
+      resolve({ query: result });
     } catch (err) {
       console.error(err);
       reject(err);
