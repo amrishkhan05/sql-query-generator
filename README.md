@@ -63,7 +63,7 @@ This package can be used to generate select statements for your tables with a JS
     selectColumns: [
         { fieldName: "", alias: "" },
     ],
-    customOrSearch: ["joinName.fieldName" , "joinName.fieldName"], // the fields in 
+    customOrSearch: ["joinName.fieldName" , "joinName.fieldName"], 
     customAndSearch: ["joinName.fieldName" , "joinName.fieldName"],
     nullCheckColumns: ["joinName.fieldName" , "joinName.fieldName"],
     customColumnQuery:"",
