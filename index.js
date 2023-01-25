@@ -28,8 +28,9 @@ const CommonSubList = (
     if (searchTerm && searchField)
       searchQuery = `${searchQuery} AND (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
     if (customSearch)
-      customSearch.forEach((elem, ind) => {
-        joinSearch = `${joinSearch} AND ${elem.field} = '${elem.value}'`;
+      customSearch.forEach(({ field, value } = el, ind) => {
+        if(field && value)
+          joinSearch = `${joinSearch} AND ${field} = '${value}'`;
       });
     if (customOrSearch && customOrSearch.length > 0)
       customOrSearch.forEach(async (el) => {
@@ -87,8 +88,12 @@ const CommonSubList = (
       joinSelect ? "," + joinSelect : joinSelect
     } ${
       customColumnQuery ? "," + customColumnQuery : ""
-    } from ${tableName} t ${joinQuery}  where  ${searchQuery.substring(4)} ${joinSearch} order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
-    const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery} where ${searchQuery.substring(4)} ${joinSearch}  ) AS total_count,`;
+    } from ${tableName} t ${joinQuery}  where  ${searchQuery.substring(
+      4
+    )} ${joinSearch} order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
+    const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery} where ${searchQuery.substring(
+      4
+    )} ${joinSearch}  ) AS total_count,`;
     const DynamicQuery = `SELECT ${totalQuery}  ${sqlQuery}  `;
     const result = DynamicQuery.trim();
     return result;
