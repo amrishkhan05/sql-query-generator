@@ -161,9 +161,12 @@ This package can be used to generate select statements for your tables with a JS
 ```
 ### Using the package
 
-    const queryGenerator = require("sql-select-query-generator");
-    queryGenerator(sampleQuery).then((res) =>
-    console.log(res));
+    const generateSelectQuery = async()=>{
+    var sql_query = await queryGenerator(sampleQuery);
+    console.log(sql_query)
+    }
+
+    generateSelectQuery();
 
 
 ### Output
