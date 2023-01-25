@@ -1,6 +1,6 @@
 {
   "name": "sql-select-query-generator",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "SQL-Query-Generator to generate select Query with joins and alias name for the fields to be selected, and the total record count using a input JSON.",
   "main": "index.js",
   "scripts": {
