@@ -88,41 +88,40 @@ This package can be used to generate select statements for your tables with a JS
     };
 
 #### Desciption of the JSON structure
-    The above JSON defines an object called "QueryConfig" which appears to be used for 
-    querying a database. It includes various properties for specifying the details of the 
-    query such as the table name, fields to be searched, conditions for searching, columns 
+    The above JSON defines an object called "QueryConfig" which appears to be used for
+    querying a database. It includes various properties for specifying the details of the
+    query such as the table name, fields to be searched, conditions for searching, columns
     to be selected, join details and query parameters.
 
 
- -   `tableName`: This is a string variable which specifies the name of the table to be queried.
+-   `tableName`: This is a string variable which specifies the name of the table to be queried.
 -   `searchField`: This is a string variable which specifies the field that should be searched in the table.
 -   `customOrSearch`, `customAndSearch`, `nullCheckColumns`: These are arrays of strings specifying the fields that should be searched, and conditions for searching.
 -   `customColumnQuery`: This is a string variable which contains custom query for selected columns.
--   `customSearch`: This is an array of objects, where each object contains two properties:
+-   `customSearch`: This is an array of objects, where each object contains two properties:  
+	-   `field`: A string specifying the field name that should be searched.
+	-   `value`: A string specifying the value to be searched in the specified field.
     
-    -   `field`: A string specifying the field name that should be searched.
-    -   `value`: A string specifying the value to be searched in the specified field.
-    
-   -   `selectColumns`: This is an array of objects, where each object contains two properties:
-	    -   `fieldName`: A string specifying the field name that should be selected.
-	    -   `alias`: A string specifying the alias for the selected field.
+-   `selectColumns`: This is an array of objects, where each object contains two properties:
+	-   `fieldName`: A string specifying the field name that should be selected.
+	-   `alias`: A string specifying the alias for the selected field.
         
--    `joins`: This is an array of objects, where each object contains several properties:
-		    - `tableName`: A string specifying the name of the table to be joined.
-		    -   `joinName`: A string specifying the name of the join.
-		    -   `type`: A string specifying the type of join.
-		    -   `isCustomJoin`: A Boolean value indicating whether the join is custom or not.
-		    -   `selectColumns`: An array of objects, where each object contains two properties:
-	        -   `fieldName`: A string specifying the field name of the joined table that should be 	selected.
-	        -   `alias`: A string specifying the alias for the selected field.
+-   `joins`: This is an array of objects, where each object contains several properties:
+	-   `tableName`: A string specifying the name of the table to be joined.
+	-   `joinName`: A string specifying the name of the join.
+	-   `type`: A string specifying the type of join.
+	-   `isCustomJoin`: A Boolean value indicating whether the join is custom or not.
+	-   `selectColumns`: An array of objects, where each object contains two properties:
+		-   `fieldName`: A string specifying the field name of the joined table that should be 	selected.
+		-   `alias`: A string specifying the alias for the selected field.
 
 -   `queryParams`: This is an object which contains several properties:
     
-	   -   `limit`: An integer specifying the maximum number of rows to be returned in the query.
-	   -   `offset`: An integer specifying the number of rows to skip before starting to return rows.
-	   -   `orderBy`: A string specifying the field name to sort the results by.
-	   -   `sortBy`: A string specifying the order of sorting (e.g. "ASC" for ascending, "DESC" for descending).
-	   -   `searchTerm`: A string specifying the term to search in the query.        
+	-   `limit`: An integer specifying the maximum number of rows to be returned in the query.
+	-   `offset`: An integer specifying the number of rows to skip before starting to return rows.
+	-   `orderBy`: A string specifying the field name to sort the results by.
+	-   `sortBy`: A string specifying the order of sorting (e.g. "ASC" for ascending, "DESC" for descending).
+	-   `searchTerm`: A string specifying the term to search in the query.        
      
 
 ##### Sample JSON to select data from the above table using the above JSON structure:
@@ -166,13 +165,16 @@ This package can be used to generate select statements for your tables with a JS
 
 
 ### Output
-    SELECT ( SELECT COUNT( 1 ) from Orders t   LEFT JOIN Customers customer on 
-    t.customer_id = customer.id  where  (customer.name like '%'abc%' OR
-    t.id like '%'abc%' ) OR (customer.address like '%'abc%' ) OR (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = ''  ) AS total_count,  
-    ( SELECT   t.*     ,   customer.name  as customer_name, customer.address  , customer.phone  as phone  from Orders t   LEFT JOIN Customers customer on 
+    SELECT ( SELECT COUNT( 1 ) from Orders t   LEFT JOIN Customers customer on
+    t.customer_id = customer.id  where  (customer.name like '%'abc%' OR 
+    t.id like '%'abc%' ) OR (customer.address like '%'abc%' ) OR
+    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = ''  ) AS total_count, 
+    ( SELECT   t.*     ,   customer.name  as customer_name, customer.address  , customer.phone  as phone  from Orders t
+    LEFT JOIN Customers customer on 
     t.customer_id = customer.id   where   (customer.name like '%'abc%' OR t.id like '%'abc%' ) 
     OR (customer.address like '%'abc%' ) OR
-    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = '' order by t.id  DESC OFFSET 5 ROWS FETCH NEXT 20 ROWS ONLY FOR JSON PATH ) AS data
+    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )
+    order by t.id  DESC OFFSET 5 ROWS FETCH NEXT 20 ROWS ONLY FOR JSON PATH ) AS data
 
 
 
