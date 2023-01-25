@@ -56,6 +56,7 @@ This package can be used to generate select statements for your tables with a JS
 
 ### JSON structure
 #### The following is the structure of the input JSON object.
+```ts
     const QueryConfig = {
     tableName: "", // this is the target table and is always considered as t
     searchField: "",
@@ -86,7 +87,7 @@ This package can be used to generate select statements for your tables with a JS
         searchTerm: "",
     },
     };
-
+```
 #### Desciption of the JSON structure
     The above JSON defines an object called "QueryConfig" which appears to be used for
     querying a database. It includes various properties for specifying the details of the
@@ -126,6 +127,7 @@ This package can be used to generate select statements for your tables with a JS
 
 ##### Sample JSON to select data from the above table using the above JSON structure:
 
+```ts
     const sampleQuery =   {
     tableName: "Orders", // this is the target table and is always considered as t  
     searchField: "customer.name",
@@ -156,7 +158,7 @@ This package can be used to generate select statements for your tables with a JS
     },
     }
 
-
+```
 ### Using the package
 
     const queryGenerator = require("sql-select-query-generator");
@@ -183,7 +185,7 @@ This package can be used to generate select statements for your tables with a JS
 - [@amrishkhan05](https://www.github.com/amrishkhan05)
 
 
-## Badges
+## License
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
