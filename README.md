@@ -1,5 +1,5 @@
 
-# SQL QUERY GENERATOR
+# SQL SELECT QUERY GENERATOR
 
 This package can be used to generate select statements for your tables with a JSON input.
 
@@ -160,7 +160,7 @@ This package can be used to generate select statements for your tables with a JS
 
 ### Using the package
 
-    const queryGenerator = require("sql-query-generator");
+    const queryGenerator = require("sql-select-query-generator");
     queryGenerator(sampleQuery).then((res) =>
     console.log(res));
 
