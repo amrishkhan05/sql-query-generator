@@ -1,4 +1,4 @@
-const CommonSubList = (
+const CommonSubList = async (
   tableName,
   selectColumns,
   searchField = null,
@@ -28,7 +28,8 @@ const CommonSubList = (
     if (searchTerm && searchField)
       searchQuery = `${searchQuery} AND (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
     if (customSearch)
-      customSearch.forEach(({ field, value } = el, ind) => {
+      customSearch.forEach((el) => {
+        const { field, value } = el;
         if (field && value)
           joinSearch = `${joinSearch} AND ${field} = '${value}'`;
       });
