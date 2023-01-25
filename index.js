@@ -29,60 +29,83 @@ const CommonSubList = (
       searchQuery = `${searchQuery} AND (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
     if (customSearch)
       customSearch.forEach(({ field, value } = el, ind) => {
-        if(field && value)
+        if (field && value)
           joinSearch = `${joinSearch} AND ${field} = '${value}'`;
       });
     if (customOrSearch && customOrSearch.length > 0)
       customOrSearch.forEach(async (el) => {
-        if (searchTerm && searchField)
-          searchQuery = `${searchQuery} OR (${el} like '%${searchTerm}%' )`;
+        try {
+          if (searchTerm && searchField)
+            searchQuery = `${searchQuery} OR (${el} like '%${searchTerm}%' )`;
+        } catch (err) {
+          console.error(err);
+        }
       });
     if (customAndSearch && customAndSearch.length > 0)
       customAndSearch.forEach(async (el) => {
-        if (searchTerm && searchField)
-          searchQuery = `${searchQuery} AND (${el} like '%${searchTerm}%' )`;
+        try {
+          if (searchTerm && searchField)
+            searchQuery = `${searchQuery} AND (${el} like '%${searchTerm}%' )`;
+        } catch (err) {
+          console.error(err);
+        }
       });
     if (joins.length > 0) {
       joins.forEach(async (el, index) => {
-        if (el.isCustomJoin) {
-          joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
-            el.tableName
-          } ${el.joinName} on ${el.customjoin.field}= ${el.customjoin.value} `;
-        } else {
-          joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
-            el.tableName
-          } ${el.joinName} on t.${el.joinName}_id = ${el.joinName}.id `;
-        }
-        let qString = "";
-        if (el.selectColumns) {
-          el.selectColumns.forEach((e, i) => {
-            qString = `${qString} ${el.joinName}.${e.fieldName}  ${
-              e.alias ? "as " + e.alias : ""
-            }${i == el.selectColumns.length - 1 ? "" : ","}`;
-          });
-        }
-        if (el.customSearch)
-          el.customSearch.forEach((elem, ind) => {
-            joinSearch = `${joinSearch} AND ${elem.field} = ${elem.value}`;
-          });
+        try {
+          if (el.isCustomJoin) {
+            joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
+              el.tableName
+            } ${el.joinName} on ${el.customjoin.field}= ${
+              el.customjoin.value
+            } `;
+          } else {
+            joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
+              el.tableName
+            } ${el.joinName} on t.${el.joinName}_id = ${el.joinName}.id `;
+          }
+          let qString = "";
+          if (el.selectColumns) {
+            el.selectColumns.forEach((e, i) => {
+              qString = `${qString} ${el.joinName}.${e.fieldName}  ${
+                e.alias ? "as " + e.alias : ""
+              }${i == el.selectColumns.length - 1 ? "" : ","}`;
+            });
+          }
+          if (el.customSearch)
+            el.customSearch.forEach((elem, ind) => {
+              joinSearch = `${joinSearch} AND ${elem.field} = ${elem.value}`;
+            });
 
-        joinSelect = ` ${joinSelect} ${
-          index == joins.length - 1 ? qString : qString + ","
-        }`;
+          joinSelect = ` ${joinSelect} ${
+            index == joins.length - 1 ? qString : qString + ","
+          }`;
+        } catch (err) {
+          console.error(err);
+        }
       });
     }
+
     if (nullCheckColums && nullCheckColums.length > 0)
       nullCheckColums.forEach(async (el) => {
-        searchQuery = `${searchQuery} AND (${el} is not null )`;
+        try {
+          searchQuery = `${searchQuery} AND (${el} is not null )`;
+        } catch (err) {
+          console.error(err);
+        }
       });
 
     let targetTableSelect = "";
     selectColumns.forEach(async (e, i) => {
-      targetTableSelect = `${targetTableSelect} ${
-        e?.field_type === "json" ? "JSON_QUERY(" : ""
-      } t.${e.fieldName} ${e?.field_type === "json" ? ")" : ""} ${
-        e.alias ? "as " + e.alias : ""
-      }  ${i == selectColumns.length - 1 ? "" : ","}`;
+      try {
+        targetTableSelect = `${targetTableSelect} ${
+          e?.field_type === "json" ? "JSON_QUERY(" : ""
+        } t.${e.fieldName} ${e?.field_type === "json" ? ")" : ""} ${
+          e.alias ? "as " + e.alias : ""
+        }  ${i == selectColumns.length - 1 ? "" : ","}`;
+      } catch (err) {
+        console.error(err);
+      }
     });
     let sqlQuery = ` ( SELECT ${targetTableSelect} ${
       joinSelect ? "," + joinSelect : joinSelect
