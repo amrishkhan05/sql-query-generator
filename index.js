@@ -108,16 +108,20 @@ const CommonSubList = async (
         console.error(err);
       }
     });
+    let SearchString = `${searchQuery.substring(4)}`;
+    SearchString += `${
+      searchQuery ? `${joinSearch}` : `${searchQuery.substring(4)}`
+    }`;
     let sqlQuery = ` ( SELECT ${targetTableSelect} ${
       joinSelect ? "," + joinSelect : joinSelect
     } ${
       customColumnQuery ? "," + customColumnQuery : ""
-    } from ${tableName} t ${joinQuery}  where  ${searchQuery.substring(
-      4
-    )} ${joinSearch} order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
-    const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery} where ${searchQuery.substring(
-      4
-    )} ${joinSearch}  ) AS total_count,`;
+    } from ${tableName} t ${joinQuery}   ${
+      SearchString ? ` where ${SearchString}` : ` `
+    }  order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
+    const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery}  ${
+      SearchString ? ` where ${SearchString}` : ` `
+    } ) AS total_count,`;
     const DynamicQuery = `SELECT ${totalQuery}  ${sqlQuery}  `;
     const result = DynamicQuery.trim();
     return result;
