@@ -160,7 +160,6 @@ const sampleQuery = {
 
 ### Using the package
 
-
 Install the package using `npm i sql-select-query-generator`
 
     const queryGenerator = require("sql-select-query-generator");
