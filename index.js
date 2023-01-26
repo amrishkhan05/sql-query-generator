@@ -26,18 +26,27 @@ const CommonSubList = async (
     let joinSearch = "";
 
     if (searchTerm && searchField)
-      searchQuery = `${searchQuery} AND (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
-    if (customSearch)
+      searchQuery = `${searchQuery}   ${
+        searchQuery ? "AND" : ""
+      } (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
+    if (customSearch){
+      console.log(customSearch);
       customSearch.forEach((el) => {
         const { field, value } = el;
         if (field && value)
-          joinSearch = `${joinSearch} AND ${field} = '${value}'`;
+          joinSearch = `${joinSearch}  ${
+            joinSearch ? "AND" : ""
+          } ${field} = '${value}'`;
       });
+    }
+    console.log(joinSearch);
     if (customOrSearch && customOrSearch.length > 0)
       customOrSearch.forEach(async (el) => {
         try {
           if (searchTerm && searchField)
-            searchQuery = `${searchQuery} OR (${el} like '%${searchTerm}%' )`;
+            searchQuery = `${searchQuery} ${
+              searchQuery ? "OR" : ""
+            } (${el} like '%${searchTerm}%' )`;
         } catch (err) {
           console.error(err);
         }
@@ -46,7 +55,9 @@ const CommonSubList = async (
       customAndSearch.forEach(async (el) => {
         try {
           if (searchTerm && searchField)
-            searchQuery = `${searchQuery} AND (${el} like '%${searchTerm}%' )`;
+            searchQuery = `${searchQuery}  ${
+              searchQuery ? "AND" : ""
+            } (${el} like '%${searchTerm}%' )`;
         } catch (err) {
           console.error(err);
         }
@@ -75,7 +86,7 @@ const CommonSubList = async (
           }
           if (el.customSearch)
             el.customSearch.forEach((elem, ind) => {
-              joinSearch = `${joinSearch} AND ${elem.field} = ${elem.value}`;
+              joinSearch = `${joinSearch} ${joinSearch?'AND':''} ${elem.field} = ${elem.value}`;
             });
 
           joinSelect = ` ${joinSelect} ${
@@ -108,10 +119,8 @@ const CommonSubList = async (
         console.error(err);
       }
     });
-    let SearchString = `${searchQuery.substring(4)}`;
-    SearchString += `${
-      searchQuery ? `${joinSearch}` : `${searchQuery.substring(4)}`
-    }`;
+    let SearchString = `${searchQuery}`;
+    SearchString += `${searchQuery ? `${searchQuery} ${joinSearch?`AND ${joinSearch}`:''} ` : `${joinSearch}`}`;
     let sqlQuery = ` ( SELECT ${targetTableSelect} ${
       joinSelect ? "," + joinSelect : joinSelect
     } ${
@@ -119,9 +128,11 @@ const CommonSubList = async (
     } from ${tableName} t ${joinQuery}   ${
       SearchString ? ` where ${SearchString}` : ` `
     }  order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
+    
     const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery}  ${
       SearchString ? ` where ${SearchString}` : ` `
     } ) AS total_count,`;
+
     const DynamicQuery = `SELECT ${totalQuery}  ${sqlQuery}  `;
     const result = DynamicQuery.trim();
     return result;
