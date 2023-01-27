@@ -1,62 +1,83 @@
+
 # SQL SELECT QUERY GENERATOR
+[![Version](https://img.shields.io/badge/Version-1.1.6-yellow.svg)]()
 
-This package can be used to generate select statements for your tables with a JSON input.
 
-**Table of Contents**
+This package can be used to generate sql select queries for your tables with a JSON input.
 
-- Table creation with relation
-- Constructing the JSON to generate the select query.
 
-## Sample Table Creation
 
-##### Create the table Customers
 
-####
 
-    CREATE TABLE Customers (
-    id INT PRIMARY KEY,
-    name VARCHAR(255),
-    address VARCHAR(255),
-    is_active [bit] NULL,
-    phone VARCHAR(20));
 
-##### Create the table Orders
 
-####
+## Installation
 
-    CREATE TABLE Orders (
-    id INT PRIMARY KEY,
-    customer_id INT,
-    order_date DATE,
-    total_cost DECIMAL(10, 2),
-    is_active [bit] NULL,
-    FOREIGN KEY (customer_id) REFERENCES Customers(id))
+Install sql-select-query-generator with npm
 
-##### Create the table Order_Details
+```bash
+npm install sql-select-query-generator  
+```
+    
+## Usage/Examples
 
-####
+```javascript
+const queryGenerator = require("sql-select-query-generator");
 
-    CREATE TABLE Order_Details (
-    id INT,
-    product_id INT,
-    quantity INT,
-    price DECIMAL(10, 2),
-    FOREIGN KEY (order_id) REFERENCES Orders(id),
-    is_active [bit] NULL,
-    FOREIGN KEY (product_id) REFERENCES Products(id));
+const sampleQuery = {
+  tableName: "Orders", // this is the target table and is always considered as t
+  searchField: "customer.name",
+  customSearch: [{ field: "", value: "" }],
+  selectColumns: [{ fieldName: "*", alias: "" }],
+  customOrSearch: ["customer.address", "customer.phone"],
+  customAndSearch: ["t.total_cost"],
+  customColumnQuery: "",
+  joins: [
+    {
+      tableName: "Customers",
+      joinName: "customer",
+      type: "LEFT",
+      isCustomJoin: false,
+      selectColumns: [
+        { fieldName: "name", alias: "customer_name" },
+        { fieldName: "address", alias: "" },
+        { fieldName: "phone", alias: "phone" },
+      ],
+    },
+  ],
+  queryParams: {
+    limit: 20,
+    offset: 5,
+    sortBy: "DESC",
+    orderBy: "t.id",
+    searchTerm: "'abc",
+  },
+};
 
-##### Create the table Products
+const generateSelectQuery = async()=>{
+  var sql_query = await queryGenerator(sampleQuery);
+  console.log(sql_query)
+}
 
-####
+generateSelectQuery();
 
-    CREATE TABLE Products (
-    id INT PRIMARY KEY,
-    name VARCHAR(255),
-    description VARCHAR(255),
-    is_active [bit] NULL,
-    price DECIMAL(10, 2));
+```
 
-### JSON structure
+
+### Output
+
+    SELECT ( SELECT COUNT( 1 ) from Orders t   LEFT JOIN Customers customer on
+    t.customer_id = customer.id  where  (customer.name like '%'abc%' OR
+    t.id like '%'abc%' ) OR (customer.address like '%'abc%' ) OR
+    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = ''  ) AS total_count,
+    ( SELECT   t.*     ,   customer.name  as customer_name, customer.address  , customer.phone  as phone  from Orders t
+    LEFT JOIN Customers customer on
+    t.customer_id = customer.id   where   (customer.name like '%'abc%' OR t.id like '%'abc%' )
+    OR (customer.address like '%'abc%' ) OR
+    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )
+    order by t.id  DESC OFFSET 5 ROWS FETCH NEXT 20 ROWS ONLY FOR JSON PATH ) AS data
+## Input JSON Structure
+
 
 #### The following is the structure of the input JSON object.
 
@@ -124,78 +145,73 @@ const QueryConfig = {
   - `sortBy`: A string specifying the order of sorting (e.g. "ASC" for ascending, "DESC" for descending).
   - `searchTerm`: A string specifying the term to search in the query.
 
-##### Sample JSON to select data from the above table using the above JSON structure:
+## Sample SQL creation queries to test the package
+### Sample Table Creation
 
-```ts
-const sampleQuery = {
-  tableName: "Orders", // this is the target table and is always considered as t
-  searchField: "customer.name",
-  customSearch: [{ field: "", value: "" }],
-  selectColumns: [{ fieldName: "*", alias: "" }],
-  customOrSearch: ["customer.address", "customer.phone"],
-  customAndSearch: ["t.total_cost"],
-  customColumnQuery: "",
-  joins: [
-    {
-      tableName: "Customers",
-      joinName: "customer",
-      type: "LEFT",
-      isCustomJoin: false,
-      selectColumns: [
-        { fieldName: "name", alias: "customer_name" },
-        { fieldName: "address", alias: "" },
-        { fieldName: "phone", alias: "phone" },
-      ],
-    },
-  ],
-  queryParams: {
-    limit: 20,
-    offset: 5,
-    sortBy: "DESC",
-    orderBy: "t.id",
-    searchTerm: "'abc",
-  },
-};
-```
+##### Create the table Customers
 
-### Using the package
+####
 
-Install the package using `npm i sql-select-query-generator`
+    CREATE TABLE Customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    address VARCHAR(255),
+    is_active [bit] NULL,
+    phone VARCHAR(20));
 
-    const queryGenerator = require("sql-select-query-generator");
-    const generateSelectQuery = async()=>{
-    var sql_query = await queryGenerator(sampleQuery);
-    console.log(sql_query)
-    }
-    generateSelectQuery();
+##### Create the table Orders
 
-### Output
+####
 
-    SELECT ( SELECT COUNT( 1 ) from Orders t   LEFT JOIN Customers customer on
-    t.customer_id = customer.id  where  (customer.name like '%'abc%' OR
-    t.id like '%'abc%' ) OR (customer.address like '%'abc%' ) OR
-    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = ''  ) AS total_count,
-    ( SELECT   t.*     ,   customer.name  as customer_name, customer.address  , customer.phone  as phone  from Orders t
-    LEFT JOIN Customers customer on
-    t.customer_id = customer.id   where   (customer.name like '%'abc%' OR t.id like '%'abc%' )
-    OR (customer.address like '%'abc%' ) OR
-    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )
-    order by t.id  DESC OFFSET 5 ROWS FETCH NEXT 20 ROWS ONLY FOR JSON PATH ) AS data
+    CREATE TABLE Orders (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_cost DECIMAL(10, 2),
+    is_active [bit] NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customers(id))
 
+##### Create the table Order_Details
+
+####
+
+    CREATE TABLE Order_Details (
+    id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES Orders(id),
+    is_active [bit] NULL,
+    FOREIGN KEY (product_id) REFERENCES Products(id));
+
+##### Create the table Products
+
+####
+
+    CREATE TABLE Products (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    description VARCHAR(255),
+    is_active [bit] NULL,
+    price DECIMAL(10, 2));
 ## Authors
 
 - [@amrishkhan05](https://www.github.com/amrishkhan05)
 
+
+
+
+
 ## License
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
 
 ## Contributing
 
 Contributions are always welcome!
 
 Please adhere to this project's `code of conduct`.
-
 ## 🚀 About Me
 
 ```ts
