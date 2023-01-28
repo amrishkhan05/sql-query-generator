@@ -1,6 +1,6 @@
 
 # SQL SELECT QUERY GENERATOR
-[![Version](https://img.shields.io/badge/Version-1.1.6-yellow.svg)]()
+[![Version](https://img.shields.io/badge/Version-1.1.7-yellow.svg)]()
 
 
 This package can be used to generate sql select queries for your tables with a JSON input.
@@ -212,31 +212,18 @@ const QueryConfig = {
 Contributions are always welcome!
 
 Please adhere to this project's `code of conduct`.
+
 ## 🚀 About Me
 
 ```ts
 export class Info {
 
   name: string = 'Amrishkhan'
-  age: number = 28
-  nationality: string[] = ['Indian']
-  languages: string[] = [ 'English', 'Tamil','Malayalam']
   occupation: string = 'Full Stack Developer'
+  
 }
 
-export class Programming {
-
-  languages: string[] = ['TypeScript', 'JavaScript']
-  stylesheets: string[] = ['CSS', 'SCSS']
-  frameworks: string[] = ['Angular', 'React']
-  query language: string[] = ['GraphQL','SQL']
-  runtimes: string[] = ['Node']
-  databases: string[] = ['MSSQL','Mongo']
-  learning: string[] = ['React','GraphQL', 'Angular']
-
-}
-
-export class Social {
+export class ConnectViaSocial {
 
   linkedin: string = 'https://www.linkedin.com/in/amrishkhan/'
   github: string = 'amrishkhan05'
