@@ -161,6 +161,7 @@ const CommonSubList = async (
  * @property {Object} config.joins[].customjoin - To join a table with one of the joins
  * @property {Object} config.joins[].customjoin.field - The field name to join the table
  * @property {Object} config.joins[].customjoin.value - The field value name to join the table
+ * @property {Object} config.nullCheckColums -Array of fields to be validated to be not null
  */
 
 const generateSelectQuery = async (selectconfig = {}) => {
