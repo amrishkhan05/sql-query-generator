@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.8
+## 1.2.0
 
 - Simplified SQL construction and removed debug output.
 - Fixed duplicated search conditions.

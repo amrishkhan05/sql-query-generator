@@ -1,7 +1,7 @@
 
 # SQL SELECT Query Generator
 
-[![Version](https://img.shields.io/badge/version-1.1.8-yellow.svg)](https://www.npmjs.com/package/sql-select-query-generator)
+[![Version](https://img.shields.io/badge/version-1.2.0-yellow.svg)](https://www.npmjs.com/package/sql-select-query-generator)
 
 Generate SQL Server SELECT queries with joins, filters, pagination, a total count, and `FOR JSON PATH` output.
 

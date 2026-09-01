@@ -1,6 +1,6 @@
 {
   "name": "sql-select-query-generator",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "Generate SQL Server SELECT queries with joins, filters, pagination, total counts, and JSON output.",
   "main": "index.js",
   "files": [
