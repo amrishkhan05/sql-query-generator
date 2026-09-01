@@ -1,190 +1,61 @@
-const CommonSubList = async (
-  tableName,
-  selectColumns,
-  searchField = null,
-  joins = [],
-  customSearch = null,
-  paramSearch = null,
-  customColumnQuery = null,
-  customOrSearch = null,
-  customAndSearch = null,
-  queryParams = {},
-  nullCheckColums = []
-) => {
-  try {
-    let {
-      sortBy = "ASC",
-      orderBy = "t.id",
-      searchTerm,
-      offset = 0,
-      limit = 20,
-    } = queryParams;
+/** @format */
 
-    let joinQuery = " ";
-    let joinSelect = "";
-    let searchQuery = "";
-    let joinSearch = "";
-
-    if (searchTerm && searchField)
-      searchQuery = `${searchQuery}   ${
-        searchQuery ? "AND" : ""
-      } (${searchField} like '%${searchTerm}%' OR t.id like '%${searchTerm}%' )`;
-    if (customSearch){
-      console.log(customSearch);
-      customSearch.forEach((el) => {
-        const { field, value } = el;
-        if (field && value)
-          joinSearch = `${joinSearch}  ${
-            joinSearch ? "AND" : ""
-          } ${field} = '${value}'`;
-      });
-    }
-    console.log(joinSearch);
-    if (customOrSearch && customOrSearch.length > 0)
-      customOrSearch.forEach(async (el) => {
-        try {
-          if (searchTerm && searchField)
-            searchQuery = `${searchQuery} ${
-              searchQuery ? "OR" : ""
-            } (${el} like '%${searchTerm}%' )`;
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    if (customAndSearch && customAndSearch.length > 0)
-      customAndSearch.forEach(async (el) => {
-        try {
-          if (searchTerm && searchField)
-            searchQuery = `${searchQuery}  ${
-              searchQuery ? "AND" : ""
-            } (${el} like '%${searchTerm}%' )`;
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    if (joins.length > 0) {
-      joins.forEach(async (el, index) => {
-        try {
-          if (el.isCustomJoin) {
-            joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
-              el.tableName
-            } ${el.joinName} on ${el.customjoin.field}= ${
-              el.customjoin.value
-            } `;
-          } else {
-            joinQuery = `${joinQuery} ${el.type ? el.type : "INNER"} JOIN ${
-              el.tableName
-            } ${el.joinName} on t.${el.joinName}_id = ${el.joinName}.id `;
-          }
-          let qString = "";
-          if (el.selectColumns) {
-            el.selectColumns.forEach((e, i) => {
-              qString = `${qString} ${el.joinName}.${e.fieldName}  ${
-                e.alias ? "as " + e.alias : ""
-              }${i == el.selectColumns.length - 1 ? "" : ","}`;
-            });
-          }
-          if (el.customSearch)
-            el.customSearch.forEach((elem, ind) => {
-              joinSearch = `${joinSearch} ${joinSearch?'AND':''} ${elem.field} = ${elem.value}`;
-            });
-
-          joinSelect = ` ${joinSelect} ${
-            index == joins.length - 1 ? qString : qString + ","
-          }`;
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    }
-
-    if (nullCheckColums && nullCheckColums.length > 0)
-      nullCheckColums.forEach(async (el) => {
-        try {
-          searchQuery = `${searchQuery} AND (${el} is not null )`;
-        } catch (err) {
-          console.error(err);
-        }
-      });
-
-    let targetTableSelect = "";
-    selectColumns.forEach(async (e, i) => {
-      try {
-        targetTableSelect = `${targetTableSelect} ${
-          e?.field_type === "json" ? "JSON_QUERY(" : ""
-        } t.${e.fieldName} ${e?.field_type === "json" ? ")" : ""} ${
-          e.alias ? "as " + e.alias : ""
-        }  ${i == selectColumns.length - 1 ? "" : ","}`;
-      } catch (err) {
-        console.error(err);
-      }
-    });
-    let SearchString = `${searchQuery}`;
-    SearchString += `${searchQuery ? `${searchQuery} ${joinSearch?`AND ${joinSearch}`:''} ` : `${joinSearch}`}`;
-    let sqlQuery = ` ( SELECT ${targetTableSelect} ${
-      joinSelect ? "," + joinSelect : joinSelect
-    } ${
-      customColumnQuery ? "," + customColumnQuery : ""
-    } from ${tableName} t ${joinQuery}   ${
-      SearchString ? ` where ${SearchString}` : ` `
-    }  order by ${orderBy}  ${sortBy} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH ) AS data`;
-    
-    const totalQuery = `( SELECT COUNT( 1 ) from ${tableName} t ${joinQuery}  ${
-      SearchString ? ` where ${SearchString}` : ` `
-    } ) AS total_count,`;
-
-    const DynamicQuery = `SELECT ${totalQuery}  ${sqlQuery}  `;
-    const result = DynamicQuery.trim();
-    return result;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
+const literal = (value) => `'${String(value).replaceAll("'", "''")}'`;
+const column = (prefix, item) => {
+  const value = `${prefix}.${item.fieldName}`;
+  const expression = item.field_type === "json" ? `JSON_QUERY(${value})` : value;
+  return `${expression}${item.alias ? ` AS ${item.alias}` : ""}`;
 };
 
-/** Common Sub List
- * @params {Object} config - Configuration to create query
- * @property {string} config.tableName - Table from where the search record to be fetched first
- * @property {string} config.selectColumns - Columns to be selected from the target tables
- * @property {string} config.searchField - Name of the column on which search can be performed by parsing the search text using query params "search"
- * @property {Object[]} config.customSearch - To add query condition with a slug or similar text
- * @property {string} config.customSearch[].field - The field in any of the joints to be added to the condition with the join name EG; t.name
- * @property {string} config.customSearch[].value - String to be checked against the field name produced in the object
- * @property {string} config.customColumnQuery - Custom query to be concatenated into the generated query
- * @property {string} config.customOrSearch - Array of fields to be validated as OR condition to the fields - (OR)
- * @property {string} config.customAndSearch -  Array of fields to be validated as AND condition to the fields - (AND)
- * @property {Object[]} config.joins[] - To perform the JOIN operation on the query
- * @property {string} config.joins[].tableName - Table name where the join should be performed
- * @property {string} config.joins[].joinName - String value of the join name for the particular join EG; FK in the target table should end with _id AND the join name should be the same without _id
- * @property {Object} config.joins[].type - Type of join EG; LEFT, RIGHT, INNER, OUTER
- * @property {Object} config.joins[].isCustomJoin - To determine whether it is a join with the target table or one of the joins.
- * @property {Object} config.joins[].customjoin - To join a table with one of the joins
- * @property {Object} config.joins[].customjoin.field - The field name to join the table
- * @property {Object} config.joins[].customjoin.value - The field value name to join the table
- * @property {Object} config.nullCheckColums -Array of fields to be validated to be not null
- */
+const generateSelectQuery = async (config = {}) => {
+  const { tableName, selectColumns, searchField, joins = [], customSearch = [], customColumnQuery, customOrSearch = [], customAndSearch = [], queryParams = {} } = config;
+  const nullCheckColumns = config.nullCheckColumns ?? config.nullCheckColums ?? [];
+  const { sortBy = "ASC", orderBy = "t.id", searchTerm, offset = 0, limit = 20 } = queryParams;
 
-const generateSelectQuery = async (selectconfig = {}) => {
-  try {
-    const config = selectconfig;
-    const response = await CommonSubList(
-      config.tableName,
-      config.selectColumns,
-      config.searchField,
-      config.joins,
-      config.customSearch,
-      config.paramSearch,
-      config.customColumnQuery,
-      config.customOrSearch,
-      config.customAndSearch,
-      config.queryParams,
-      config.nullCheckColums
-    );
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
+  if (!tableName || !Array.isArray(selectColumns) || selectColumns.length === 0) {
+    throw new TypeError("tableName and at least one select column are required");
   }
+  if (!Number.isInteger(offset) || offset < 0 || !Number.isInteger(limit) || limit < 1) {
+    throw new RangeError("offset must be non-negative and limit must be positive integers");
+  }
+
+  const direction = String(sortBy).toUpperCase();
+  if (direction !== "ASC" && direction !== "DESC") throw new TypeError("sortBy must be ASC or DESC");
+
+  const joinSql = joins
+    .map((join) => {
+      const on = join.isCustomJoin ? `${join.customjoin.field} = ${join.customjoin.value}` : `t.${join.joinName}_id = ${join.joinName}.id`;
+      return `${join.type || "INNER"} JOIN ${join.tableName} ${join.joinName} ON ${on}`;
+    })
+    .join(" ");
+
+  const selected = [
+    ...selectColumns.map((item) => column("t", item)),
+    ...joins.flatMap((join) => (join.selectColumns || []).map((item) => column(join.joinName, item))),
+    ...(customColumnQuery ? [customColumnQuery] : []),
+  ].join(", ");
+
+  const conditions = [];
+  if (searchTerm != null && searchTerm !== "" && searchField) {
+    const pattern = literal(`%${searchTerm}%`);
+    const alternatives = [searchField, "t.id", ...customOrSearch].map((field) => `${field} LIKE ${pattern}`);
+    conditions.push(`(${alternatives.join(" OR ")})`);
+    conditions.push(...customAndSearch.map((field) => `${field} LIKE ${pattern}`));
+  }
+  conditions.push(...customSearch.filter(({ field, value }) => field && value != null).map(({ field, value }) => `${field} = ${literal(value)}`));
+  conditions.push(
+    ...joins
+      .flatMap((join) => join.customSearch || [])
+      .filter(({ field, value }) => field && value != null)
+      .map(({ field, value }) => `${field} = ${literal(value)}`),
+  );
+  conditions.push(...nullCheckColumns.map((field) => `${field} IS NOT NULL`));
+
+  const from = `FROM ${tableName} t${joinSql ? ` ${joinSql}` : ""}`;
+  const where = conditions.length ? ` WHERE ${conditions.join(" AND ")}` : "";
+  const count = `(SELECT COUNT(1) ${from}${where}) AS total_count`;
+  const data = `(SELECT ${selected} ${from}${where} ORDER BY ${orderBy} ${direction} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY FOR JSON PATH) AS data`;
+  return `SELECT ${count}, ${data}`;
 };
 
 module.exports = generateSelectQuery;

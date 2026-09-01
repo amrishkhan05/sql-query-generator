@@ -1,37 +1,29 @@
 
-# SQL SELECT QUERY GENERATOR
-[![Version](https://img.shields.io/badge/Version-1.1.7-yellow.svg)]()
+# SQL SELECT Query Generator
 
+[![Version](https://img.shields.io/badge/version-1.1.8-yellow.svg)](https://www.npmjs.com/package/sql-select-query-generator)
 
-This package can be used to generate sql select queries for your tables with a JSON input.
-
-
-
-
-
-
+Generate SQL Server SELECT queries with joins, filters, pagination, a total count, and `FOR JSON PATH` output.
 
 ## Installation
 
-Install sql-select-query-generator with npm
-
 ```bash
-npm install sql-select-query-generator  
+npm install sql-select-query-generator
 ```
-    
-## Usage/Examples
+
+Node.js 18 or newer is required.
+
+## Usage
 
 ```javascript
 const queryGenerator = require("sql-select-query-generator");
 
 const sampleQuery = {
-  tableName: "Orders", // this is the target table and is always considered as t
+  tableName: "Orders",
   searchField: "customer.name",
-  customSearch: [{ field: "", value: "" }],
   selectColumns: [{ fieldName: "*", alias: "" }],
   customOrSearch: ["customer.address", "customer.phone"],
   customAndSearch: ["t.total_cost"],
-  customColumnQuery: "",
   joins: [
     {
       tableName: "Customers",
@@ -50,184 +42,36 @@ const sampleQuery = {
     offset: 5,
     sortBy: "DESC",
     orderBy: "t.id",
-    searchTerm: "'abc",
+    searchTerm: "abc",
   },
 };
 
-const generateSelectQuery = async()=>{
-  var sql_query = await queryGenerator(sampleQuery);
-  console.log(sql_query)
-}
-
-generateSelectQuery();
+const sql = await queryGenerator(sampleQuery);
+console.log(sql);
 
 ```
 
+## Options
 
-### Output
+| Field | Description |
+| --- | --- |
+| `tableName` | Required target table. It is aliased as `t`. |
+| `selectColumns` | Required columns from the target table. Supports `alias` and `field_type: "json"`. |
+| `searchField` | Primary field searched by `queryParams.searchTerm`. |
+| `customOrSearch` | Additional fields included in the text-search `OR` group. |
+| `customAndSearch` | Fields that must also match the search term. |
+| `customSearch` | Exact `{ field, value }` filters. String values are SQL-escaped. |
+| `nullCheckColumns` | Fields required to be non-null. The old misspelling `nullCheckColums` remains supported. |
+| `customColumnQuery` | Trusted custom SELECT expression appended to the selected columns. |
+| `joins` | Join definitions with `tableName`, `joinName`, optional `type`, selected columns, and optional custom join/filter fields. |
+| `queryParams` | `searchTerm`, `orderBy` (default `t.id`), `sortBy` (`ASC` or `DESC`), `offset` (default `0`), and `limit` (default `20`). |
 
-    SELECT ( SELECT COUNT( 1 ) from Orders t   LEFT JOIN Customers customer on
-    t.customer_id = customer.id  where  (customer.name like '%'abc%' OR
-    t.id like '%'abc%' ) OR (customer.address like '%'abc%' ) OR
-    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )  AND  = ''  ) AS total_count,
-    ( SELECT   t.*     ,   customer.name  as customer_name, customer.address  , customer.phone  as phone  from Orders t
-    LEFT JOIN Customers customer on
-    t.customer_id = customer.id   where   (customer.name like '%'abc%' OR t.id like '%'abc%' )
-    OR (customer.address like '%'abc%' ) OR
-    (customer.phone like '%'abc%' ) AND (t.total_cost like '%'abc%' )
-    order by t.id  DESC OFFSET 5 ROWS FETCH NEXT 20 ROWS ONLY FOR JSON PATH ) AS data
-## Input JSON Structure
+The function returns a Promise containing the SQL string. Table names, column names, join expressions, `orderBy`, and `customColumnQuery` are SQL syntax and must come from trusted application configuration. User-provided values belong in `searchTerm` or exact-search `value` fields, which escape single quotes.
 
+## Author
 
-#### The following is the structure of the input JSON object.
-
-```ts
-const QueryConfig = {
-  tableName: "", // this is the target table and is always considered as t
-  searchField: "",
-  customSearch: [{ field: "", value: "" }],
-  selectColumns: [{ fieldName: "", alias: "" }],
-  customOrSearch: ["joinName.fieldName", "joinName.fieldName"],
-  customAndSearch: ["joinName.fieldName", "joinName.fieldName"],
-  nullCheckColumns: ["joinName.fieldName", "joinName.fieldName"],
-  customColumnQuery: "",
-  joins: [
-    {
-      tableName: "",
-      joinName: "",
-      type: "",
-      isCustomJoin: false,
-      selectColumns: [{ fieldName: "", alias: "" }],
-    },
-  ],
-  queryParams: {
-    limit: 0,
-    offset: 0,
-    sortBy: "",
-    orderBy: "",
-    searchTerm: "",
-  },
-};
-```
-
-#### Desciption of the JSON structure
-
-    The above JSON defines an object called "QueryConfig" which appears to be used for
-    querying a database. It includes various properties for specifying the details of the
-    query such as the table name, fields to be searched, conditions for searching, columns
-    to be selected, join details and query parameters.
-
-- `tableName`: This is a string variable which specifies the name of the table to be queried.
-- `searchField`: This is a string variable which specifies the field that should be searched in the table.
-- `customOrSearch`, `customAndSearch`, `nullCheckColumns`: These are arrays of strings specifying the fields that should be searched, and conditions for searching.
-- `customColumnQuery`: This is a string variable which contains custom query for selected columns.
-- `customSearch`: This is an array of objects, where each object contains two properties:
-  - `field`: A string specifying the field name that should be searched.
-  - `value`: A string specifying the value to be searched in the specified field.
-- `selectColumns`: This is an array of objects, where each object contains two properties:
-  - `fieldName`: A string specifying the field name that should be selected.
-  - `alias`: A string specifying the alias for the selected field.
-- `joins`: This is an array of objects, where each object contains several properties:
-
-  - `tableName`: A string specifying the name of the table to be joined.
-  - `joinName`: A string specifying the name of the join.
-  - `type`: A string specifying the type of join.
-  - `isCustomJoin`: A Boolean value indicating whether the join is custom or not.
-  - `selectColumns`: An array of objects, where each object contains two properties:
-    - `fieldName`: A string specifying the field name of the joined table that should be selected.
-    - `alias`: A string specifying the alias for the selected field.
-
-- `queryParams`: This is an object which contains several properties:
-
-  - `limit`: An integer specifying the maximum number of rows to be returned in the query.
-  - `offset`: An integer specifying the number of rows to skip before starting to return rows.
-  - `orderBy`: A string specifying the field name to sort the results by.
-  - `sortBy`: A string specifying the order of sorting (e.g. "ASC" for ascending, "DESC" for descending).
-  - `searchTerm`: A string specifying the term to search in the query.
-
-## Sample SQL creation queries to test the package
-### Sample Table Creation
-
-##### Create the table Customers
-
-####
-
-    CREATE TABLE Customers (
-    id INT PRIMARY KEY,
-    name VARCHAR(255),
-    address VARCHAR(255),
-    is_active [bit] NULL,
-    phone VARCHAR(20));
-
-##### Create the table Orders
-
-####
-
-    CREATE TABLE Orders (
-    id INT PRIMARY KEY,
-    customer_id INT,
-    order_date DATE,
-    total_cost DECIMAL(10, 2),
-    is_active [bit] NULL,
-    FOREIGN KEY (customer_id) REFERENCES Customers(id))
-
-##### Create the table Order_Details
-
-####
-
-    CREATE TABLE Order_Details (
-    id INT,
-    product_id INT,
-    quantity INT,
-    price DECIMAL(10, 2),
-    FOREIGN KEY (order_id) REFERENCES Orders(id),
-    is_active [bit] NULL,
-    FOREIGN KEY (product_id) REFERENCES Products(id));
-
-##### Create the table Products
-
-####
-
-    CREATE TABLE Products (
-    id INT PRIMARY KEY,
-    name VARCHAR(255),
-    description VARCHAR(255),
-    is_active [bit] NULL,
-    price DECIMAL(10, 2));
-## Authors
-
-- [@amrishkhan05](https://www.github.com/amrishkhan05)
-
-
-
-
+[@amrishkhan05](https://github.com/amrishkhan05)
 
 ## License
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-
-
-## Contributing
-
-Contributions are always welcome!
-
-Please adhere to this project's `code of conduct`.
-
-## 🚀 About Me
-
-```ts
-export class Info {
-
-  name: string = 'Amrishkhan'
-  occupation: string = 'Full Stack Developer'
-  
-}
-
-export class ConnectViaSocial {
-
-  linkedin: string = 'https://www.linkedin.com/in/amrishkhan/'
-  github: string = 'amrishkhan05'
-  instagram: string = '@aka_batman'
-
-}
-```
+[MIT](LICENSE)

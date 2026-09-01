@@ -1,14 +1,20 @@
 {
   "name": "sql-select-query-generator",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "SQL-Query-Generator to generate select Query with joins and alias name for the fields to be selected, and the total record count using a input JSON.",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://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@github.com/amrishkhan05/sql-query-generator.git"
+    "url": "git+https://github.com/amrishkhan05/sql-query-generator.git"
   },
   "keywords": [
     "SQL",
