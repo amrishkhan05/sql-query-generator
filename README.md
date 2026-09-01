@@ -58,9 +58,9 @@ For a runnable version, use `npm run example` or see [examples/basic.js](example
 | --- | --- |
 | `tableName` | Required target table. It is aliased as `t`. |
 | `selectColumns` | Required columns from the target table. Supports `alias` and `field_type: "json"`. |
-| `searchField` | Primary field searched by `queryParams.searchTerm`. |
-| `customOrSearch` | Additional fields included in the text-search `OR` group. |
-| `customAndSearch` | Fields that must also match the search term. |
+| `searchField` | Primary field searched by `queryParams.searchTerm`. Search text is matched literally within `%...%`. |
+| `customOrSearch` | Additional fields included in the text-search `OR` group. It can be used without `searchField`. |
+| `customAndSearch` | Fields that must also match the search term. It can be used without `searchField`. |
 | `customSearch` | Exact `{ field, value }` filters. String values are SQL-escaped. |
 | `nullCheckColumns` | Fields required to be non-null. The old misspelling `nullCheckColums` remains supported. |
 | `customColumnQuery` | Trusted custom SELECT expression appended to the selected columns. |

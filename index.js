@@ -1,6 +1,7 @@
 /** @format */
 
 const literal = (value) => `'${String(value).replaceAll("'", "''")}'`;
+const likePattern = (value) => literal(`%${String(value).replaceAll("[", "[[]").replaceAll("%", "[%]").replaceAll("_", "[_]")}%`);
 const column = (prefix, item) => {
   const value = `${prefix}.${item.fieldName}`;
   const expression = item.field_type === "json" ? `JSON_QUERY(${value})` : value;
@@ -14,6 +15,12 @@ const generateSelectQuery = async (config = {}) => {
 
   if (!tableName || !Array.isArray(selectColumns) || selectColumns.length === 0) {
     throw new TypeError("tableName and at least one select column are required");
+  }
+  for (const [name, value] of Object.entries({ joins, customSearch, customOrSearch, customAndSearch, nullCheckColumns })) {
+    if (!Array.isArray(value)) throw new TypeError(`${name} must be an array`);
+  }
+  if (joins.some((join) => join.isCustomJoin && (!join.customjoin?.field || !join.customjoin?.value))) {
+    throw new TypeError("custom joins require customjoin.field and customjoin.value");
   }
   if (!Number.isInteger(offset) || offset < 0 || !Number.isInteger(limit) || limit < 1) {
     throw new RangeError("offset must be non-negative and limit must be positive integers");
@@ -36,10 +43,10 @@ const generateSelectQuery = async (config = {}) => {
   ].join(", ");
 
   const conditions = [];
-  if (searchTerm != null && searchTerm !== "" && searchField) {
-    const pattern = literal(`%${searchTerm}%`);
-    const alternatives = [searchField, "t.id", ...customOrSearch].map((field) => `${field} LIKE ${pattern}`);
-    conditions.push(`(${alternatives.join(" OR ")})`);
+  if (searchTerm != null && searchTerm !== "" && (searchField || customOrSearch.length || customAndSearch.length)) {
+    const pattern = likePattern(searchTerm);
+    const alternatives = [searchField, ...(searchField ? ["t.id"] : []), ...customOrSearch].filter(Boolean).map((field) => `${field} LIKE ${pattern}`);
+    if (alternatives.length) conditions.push(`(${alternatives.join(" OR ")})`);
     conditions.push(...customAndSearch.map((field) => `${field} LIKE ${pattern}`));
   }
   conditions.push(...customSearch.filter(({ field, value }) => field && value != null).map(({ field, value }) => `${field} = ${literal(value)}`));
