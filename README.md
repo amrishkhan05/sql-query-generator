@@ -77,6 +77,10 @@ request. See the [changelog](CHANGELOG.md) for release notes.
 
 Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
+Releases are published automatically from version tags through npm Trusted
+Publishing. Maintainer setup and release commands are in
+[CONTRIBUTING.md](CONTRIBUTING.md#releases).
+
 ## Contributors
 
 See the repository's [contributors](https://github.com/amrishkhan05/sql-query-generator/graphs/contributors).

@@ -25,6 +25,9 @@
   ],
   "author": "Amrishkhan Sheik Abdullah",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/amrishkhan05/sql-query-generator/issues"
   },
