@@ -1,16 +1,18 @@
 {
   "name": "sql-select-query-generator",
   "version": "1.1.8",
-  "description": "SQL-Query-Generator to generate select Query with joins and alias name for the fields to be selected, and the total record count using a input JSON.",
+  "description": "Generate SQL Server SELECT queries with joins, filters, pagination, total counts, and JSON output.",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "examples"
   ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "example": "node examples/basic.js"
   },
   "repository": {
     "type": "git",

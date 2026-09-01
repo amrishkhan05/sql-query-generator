@@ -48,8 +48,9 @@ const sampleQuery = {
 
 const sql = await queryGenerator(sampleQuery);
 console.log(sql);
-
 ```
+
+For a runnable version, use `npm run example` or see [examples/basic.js](examples/basic.js).
 
 ## Options
 
@@ -67,6 +68,18 @@ console.log(sql);
 | `queryParams` | `searchTerm`, `orderBy` (default `t.id`), `sortBy` (`ASC` or `DESC`), `offset` (default `0`), and `limit` (default `20`). |
 
 The function returns a Promise containing the SQL string. Table names, column names, join expressions, `orderBy`, and `customColumnQuery` are SQL syntax and must come from trusted application configuration. User-provided values belong in `searchTerm` or exact-search `value` fields, which escape single quotes.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), follow the
+[code of conduct](CODE_OF_CONDUCT.md), and run `npm test` before opening a pull
+request. See the [changelog](CHANGELOG.md) for release notes.
+
+Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
+## Contributors
+
+See the repository's [contributors](https://github.com/amrishkhan05/sql-query-generator/graphs/contributors).
 
 ## Author
 
